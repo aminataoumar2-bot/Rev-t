@@ -132,29 +132,147 @@ font-size: 13px;
 <div id="status" class="small">Connecte Supabase pour charger les annonces partagées.</div><div id="cards" class="cards"></div>
 </main><footer>ReVêt — Version de démarrage. Vérifie toujours l’article et le vendeur avant tout paiement.</footer>
 <script>
-(()=>{const $=id=>document.getElementById(id);let db=null,user=null,items=[];
-const say=(id,t,ok=false)=>{$(id).textContent=t;$(id).className=ok?'small success':'small'};
+
+(()=>{
+const $=id=>document.getElementById(id);
+let db=null,user=null,items=[];
+
+const say=(id,t,ok=false)=>{
+  $(id).textContent=t;
+  $(id).className=ok?'small success':'small';
+};
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const money=n=>new Intl.NumberFormat('fr-FR').format(Number(n)||0)+' GNF';
-function render(){let q=$('search').value.toLowerCase(),cat=$('catfilter').value,sort=$('sort').value;let a=items.filter(x=>(!cat||x.category===cat)&&[x.title,x.description,x.city,x.category].some(v=>String(v||'').toLowerCase().includes(q)));a.sort((x,y)=>sort==='low'?x.price-y.price:sort==='high'?y.price-x.price:new Date(y.created_at)-new Date(x.created_at));$('count').textContent=a.length+' annonce(s)';$('cards').innerHTML=a.map(x=>`<article class="card"><div class="photo">${x.image_url?`<img src="${esc(x.image_url)}" alt="${esc(x.title)}">`:'Photo à venir'}</div><div class="body"><div class="price">${money(x.price)}</div><h3>${esc(x.title)}</h3><div class="small">${esc(x.category)} · ${esc(x.size||'Taille non précisée')}</div><div class="small">${esc(x.city||'Guinée')} · ${esc(x.condition||'')}</div><p>${esc(x.description||'')}</p><div class="small">Vendeur : ${esc(x.seller_name||'Membre ReVêt')}</div>${x.seller_phone?`<p><a href="https://wa.me/${esc(x.seller_phone.replace(/\D/g,''))}?text=${encodeURIComponent('Bonjour, votre annonce m’intéresse : '+x.title)}" target="_blank">Contacter sur WhatsApp</a></p>`:''}</div></article>`).join('')||'<p class="small">Aucune annonce pour le moment.</p>'}
-async function load(){let r=await db.from('listings').select('*').order('created_at',{ascending:false}).limit(100);if(r.error){$('status').textContent='Erreur de chargement : '+r.error.message;return}items=r.data||[];$('status').textContent='Annonces chargées depuis ReVêt.';render()}
-$('connect').onclick=async()=>{let u=$('url').value.trim().replace(/\/$/,''),k=$('key').value.trim();if(!u.startsWith('https://')||!k){say('configMsg','Vérifie le Project URL et la clé publique.');return}db=window.supabase.createClient(u,k);let s=await db.auth.getSession();if(s.error){say('configMsg',s.error.message);return}user=s.data.session?.user||null;db.auth.onAuthStateChange((_e,s)=>{user=s?.user||null;updateAuth()});say('configMsg','Supabase connecté.',true);await load();updateAuth()}
-function updateAuth(){$('logout').classList.toggle('hidden',!user);$('login').classList.toggle('hidden',!!user);$('signup').classList.toggle('hidden',!!user)}
-$('authToggle').onclick=()=>{$('auth').classList.toggle('hidden')};$('publishToggle').onclick=()=>{$('publish').classList.toggle('hidden')};
-$('signup').onclick=async()=>{if(!db)return say('authMsg','Connecte Supabase d’abord.');let r=await db.auth.signUp({email:$('email').value.trim(),password:$('pass').value});say('authMsg',r.error?r.error.message:'Inscription envoyée. Vérifie ton e-mail si une confirmation est demandée.',!r.error)};
-$('login').onclick=async()=>{$('connect').onclick=async()=>{let u=$('url').value.trim().replace(/\/$/,''),k=$('key').value.trim();if(!u.startsWith('https://')||!k){say('configMsg','Vérifie le Project URL et la clé publique.');return}db=window.supabase.createClient(u,k);let s=await db.auth.getSession();if(s.error){say('configMsg',s.error.message);return}user=s.data.session?.user||null;db.auth.onAuthStateChange((_e,s)=>{user=s?.user||null;updateAuth()});say('configMsg','Supabase connecté.',true);await load();updateAuth()}
-function updateAuth(){$('logout').classList.toggle('hidden',!user);$('login').classList.toggle('hidden',!!user);$('signup').classList.toggle('hidden',!!user)}
-$('authToggle').onclick=()=>{$('auth').classList.toggle('hidden')};$('publishToggle').onclick=()=>{$('publish').classList.toggle('hidden')};
-$('signup').onclick=async()=>{if(!db)return say('authMsg','Connecte Supabase d’abord.');let r=await db.auth.signUp({email:$('email').value.trim(),password:$('pass').value});say('authMsg',r.error?r.error.message:'Inscription envoyée. Vérifie ton e-mail si une confirmation est demandée.',!r.error)};
-$('login').onclick=async()=>{if(!db)return say('authMsg','Connecte Supabase d’abord.');let r=await db.auth.signInWithPassword({email:$('email').value.trim(),password:$('pass').value});say('authMsg',r.error?r.error.message:'Connexion réussie.',!r.error);if(!r.error){user=r.data.user;updateAuth()}};
-$('logout').onclick=async()=>{await db.auth.signOut();user=null;updateAuth()};
-$('submit').onclick=async()=>{if(!db)return say('pubMsg','Connecte Supabase d’abord.');if(!user)return say('pubMsg','Connecte-toi ou crée un compte avant de publier.');let title=$('title').value.trim(),price=Number($('price').value),f=$('photo').files[0];if(!title||!Number.isFinite(price)||price<0)return say('pubMsg','Remplis le titre et le prix.');let image_url=null;if(f){if(f.size>5*1024*1024)return say('pubMsg','La photo doit faire moins de 5 MB.');if(!['image/jpeg','image/png','image/webp'].includes(f.type))return say('pubMsg','Choisis JPG, PNG ou WEBP.');let ext=f.type==='image/png'?'png':f.type==='image/webp'?'webp':'jpg',path=user.id+'/'+crypto.randomUUID()+'.'+ext;let up=await db.storage.from('vêtements').upload(path,f,{contentType:f.type});if(up.error)return say('pubMsg','Erreur photo : '+up.error.message);image_url=db.storage.from('vêtements').getPublicUrl(path).data.publicUrl}
-let row={title,price:Math.round(price),category:$('category').value,size:$('size').value||null,condition:$('condition').value,description:$('desc').value||null,image_url,seller_id:user.id,seller_name:$('seller').value||null,seller_phone:$('phone').value||null,city:$('city').value||'Conakry'};let r=await db.from('listings').insert(row);if(r.error)return say('pubMsg','Erreur annonce : '+r.error.message);say('pubMsg','Annonce publiée !',true);await load()};
-['search','catfilter','sort'].forEach(id=>$(id).addEventListener(id==='search'?'input':'change',render));
-})();if(!db)return say('authMsg','Connecte Supabase d’abord.');let r=await db.auth.signInWithPassword({email:$('email').value.trim(),password:$('pass').value});say('authMsg',r.error?r.error.message:'Connexion réussie.',!r.error);if(!r.error){user=r.data.user;updateAuth()}};
-$('logout').onclick=async()=>{await db.auth.signOut();user=null;updateAuth()};
-$('submit').onclick=async()=>{if(!db)return say('pubMsg','Connecte Supabase d’abord.');if(!user)return say('pubMsg','Connecte-toi ou crée un compte avant de publier.');let title=$('title').value.trim(),price=Number($('price').value),f=$('photo').files[0];if(!title||!Number.isFinite(price)||price<0)return say('pubMsg','Remplis le titre et le prix.');let image_url=null;if(f){if(f.size>5*1024*1024)return say('pubMsg','La photo doit faire moins de 5 MB.');if(!['image/jpeg','image/png','image/webp'].includes(f.type))return say('pubMsg','Choisis JPG, PNG ou WEBP.');let ext=f.type==='image/png'?'png':f.type==='image/webp'?'webp':'jpg',path=user.id+'/'+crypto.randomUUID()+'.'+ext;let up=await db.storage.from('vêtements').upload(path,f,{contentType:f.type});if(up.error)return say('pubMsg','Erreur photo : '+up.error.message);image_url=db.storage.from('vêtements').getPublicUrl(path).data.publicUrl}
-let row={title,price:Math.round(price),category:$('category').value,size:$('size').value||null,condition:$('condition').value,description:$('desc').value||null,image_url,seller_id:user.id,seller_name:$('seller').value||null,seller_phone:$('phone').value||null,city:$('city').value||'Conakry'};let r=await db.from('listings').insert(row);if(r.error)return say('pubMsg','Erreur annonce : '+r.error.message);say('pubMsg','Annonce publiée !',true);await load()};
-['search','catfilter','sort'].forEach(id=>$(id).addEventListener(id==='search'?'input':'change',render));
+
+function render(){
+  let q=$('search').value.toLowerCase(),cat=$('catfilter').value,sort=$('sort').value;
+  let a=items.filter(x=>(!cat||x.category===cat)&&[x.title,x.description,x.city,x.category].some(v=>String(v||'').toLowerCase().includes(q)));
+  a.sort((x,y)=>sort==='low'?x.price-y.price:sort==='high'?y.price-x.price:new Date(y.created_at)-new Date(x.created_at));
+  $('count').textContent=a.length+' annonce(s)';
+  $('cards').innerHTML=a.map(x=>`<article class="card"><div class="photo">${x.image_url?`<img src="${esc(x.image_url)}" alt="${esc(x.title)}">`:'Photo à venir'}</div><div class="body"><div class="price">${money(x.price)}</div><h3>${esc(x.title)}</h3><div class="small">${esc(x.category)} · ${esc(x.size||'Taille non précisée')}</div><div class="small">${esc(x.city||'Guinée')} · ${esc(x.condition||'')}</div><p>${esc(x.description||'')}</p><div class="small">Vendeur : ${esc(x.seller_name||'Membre ReVêt')}</div>${x.seller_phone?`<p><a href="https://wa.me/${esc(x.seller_phone.replace(/\D/g,''))}?text=${encodeURIComponent('Bonjour, votre annonce m’intéresse : '+x.title)}" target="_blank">Contacter sur WhatsApp</a></p>`:''}</div></article>`).join('')||'<p class="small">Aucune annonce pour le moment.</p>';
+}
+
+async function load(){
+  if(!db)return;
+  let r=await db.from('listings').select('*').order('created_at',{ascending:false}).limit(100);
+  if(r.error){$('status').textContent='Erreur de chargement : '+r.error.message;return;}
+  items=r.data||[];
+  $('status').textContent='Annonces chargées depuis ReVêt.';
+  render();
+}
+
+function updateAuth(){
+  $('logout').classList.toggle('hidden',!user);
+  $('login').classList.toggle('hidden',!!user);
+  $('signup').classList.toggle('hidden',!!user);
+}
+
+$('connect').onclick=async()=>{
+  try{
+    let u=$('url').value.trim().replace(/\/$/,'');
+    let k=$('key').value.trim();
+    if(!u.startsWith('https://')||!k){
+      say('configMsg','Vérifie le Project URL et la clé publique.');
+      return;
+    }
+    if(!window.supabase){
+      say('configMsg','La bibliothèque Supabase ne se charge pas. Recharge la page.');
+      return;
+    }
+    db=window.supabase.createClient(u,k);
+    let s=await db.auth.getSession();
+    if(s.error)throw s.error;
+    user=s.data.session?.user||null;
+    db.auth.onAuthStateChange((_e,s)=>{
+      user=s?.user||null;
+      updateAuth();
+    });
+    say('configMsg','Supabase connecté.',true);
+    await load();
+    updateAuth();
+  }catch(e){
+    say('configMsg','Erreur Supabase : '+e.message);
+  }
+};
+
+$('authToggle').onclick=()=> $('auth').classList.toggle('hidden');
+$('publishToggle').onclick=()=> $('publish').classList.toggle('hidden');
+
+$('signup').onclick=async()=>{
+  try{
+    if(!db)return say('authMsg','Connecte Supabase d’abord.');
+    let r=await db.auth.signUp({email:$('email').value.trim(),password:$('pass').value});
+    say('authMsg',r.error?r.error.message:'Inscription envoyée. Vérifie ton e-mail si une confirmation est demandée.',!r.error);
+  }catch(e){say('authMsg','Erreur : '+e.message);}
+};
+
+$('login').onclick=async()=>{
+  try{
+    if(!db)return say('authMsg','Connecte Supabase d’abord.');
+    let r=await db.auth.signInWithPassword({email:$('email').value.trim(),password:$('pass').value});
+    if(r.error)return say('authMsg',r.error.message);
+    user=r.data.user;
+    updateAuth();
+    say('authMsg','Connexion réussie.',true);
+  }catch(e){say('authMsg','Erreur de connexion : '+e.message);}
+};
+
+$('forgot').onclick=async()=>{
+  try{
+    if(!db)return say('authMsg','Connecte Supabase d’abord.');
+    let email=$('email').value.trim();
+    if(!email)return say('authMsg','Entre ton adresse e-mail avant de demander un lien.');
+    let r=await db.auth.resetPasswordForEmail(email,{
+      redirectTo:'https://aminataoumar2-bot.github.io/Rev-t/'
+    });
+    say('authMsg',r.error?r.error.message:'Demande envoyée. Vérifie ta boîte mail.',!r.error);
+  }catch(e){say('authMsg','Erreur : '+e.message);}
+};
+
+$('logout').onclick=async()=>{
+  try{
+    if(!db)return;
+    let r=await db.auth.signOut();
+    if(r.error)return say('authMsg',r.error.message);
+    user=null;
+    updateAuth();
+    say('authMsg','Déconnexion réussie.',true);
+  }catch(e){say('authMsg','Erreur : '+e.message);}
+};
+
+$('submit').onclick=async()=>{
+  try{
+    if(!db)return say('pubMsg','Connecte Supabase d’abord.');
+    if(!user)return say('pubMsg','Connecte-toi ou crée un compte avant de publier.');
+    let title=$('title').value.trim(),price=Number($('price').value),f=$('photo').files[0];
+    if(!title||!Number.isFinite(price)||price<0)return say('pubMsg','Remplis le titre et le prix.');
+    let image_url=null;
+    if(f){
+      if(f.size>5*1024*1024)return say('pubMsg','La photo doit faire moins de 5 MB.');
+      if(!['image/jpeg','image/png','image/webp'].includes(f.type))return say('pubMsg','Choisis JPG, PNG ou WEBP.');
+      let ext=f.type==='image/png'?'png':f.type==='image/webp'?'webp':'jpg';
+      let path=user.id+'/'+crypto.randomUUID()+'.'+ext;
+      let up=await db.storage.from('vêtements').upload(path,f,{contentType:f.type});
+      if(up.error)return say('pubMsg','Erreur photo : '+up.error.message);
+      image_url=db.storage.from('vêtements').getPublicUrl(path).data.publicUrl;
+    }
+    let row={
+      title,price:Math.round(price),category:$('category').value,
+      size:$('size').value||null,condition:$('condition').value,
+      description:$('desc').value||null,image_url,seller_id:user.id,
+      seller_name:$('seller').value||null,seller_phone:$('phone').value||null,
+      city:$('city').value||'Conakry'
+    };
+    let r=await db.from('listings').insert(row);
+    if(r.error)return say('pubMsg','Erreur annonce : '+r.error.message);
+    say('pubMsg','Annonce publiée !',true);
+    await load();
+  }catch(e){say('pubMsg','Erreur : '+e.message);}
+};
+
+['search','catfilter','sort'].forEach(id=>
+  $(id).addEventListener(id==='search'?'input':'change',render)
+);
 })();
+
 </script></body></html>
