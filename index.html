@@ -252,9 +252,9 @@ $('submit').onclick=async()=>{
       if(!['image/jpeg','image/png','image/webp'].includes(f.type))return say('pubMsg','Choisis JPG, PNG ou WEBP.');
       let ext=f.type==='image/png'?'png':f.type==='image/webp'?'webp':'jpg';
       let path=user.id+'/'+crypto.randomUUID()+'.'+ext;
-      let up=await db.storage.from('vêtements').upload(path,f,{contentType:f.type});
+      let up=await db.storage.from('photos de revêtement 2026').upload(path,f,{contentType:f.type});
       if(up.error)return say('pubMsg','Erreur photo : '+up.error.message);
-      image_url=db.storage.from('vêtements').getPublicUrl(path).data.publicUrl
+      image_url=db.storage.from('photos de revêtement 2026').getPublicUrl(path).data.publicUrl
     }
     let row={
       title,price:Math.round(price),category:$('category').value,
