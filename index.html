@@ -254,7 +254,7 @@ $('submit').onclick=async()=>{
       let path=user.id+'/'+crypto.randomUUID()+'.'+ext;
       let up=await db.storage.from('revet-photos-2026').upload(path,f,{contentType:f.type})(path,f,{contentType:f.type})
       if(up.error)return say('pubMsg','Erreur photo : '+up.error.message);
-      image_url=db.storage.from('photos de revêtement 2026').getPublicUrl(path).data.publicUrl
+      image_url=db.storage.image_url=db.storage.from('revet-photos-2026').getPublicUrl(path).data.publicUrl
     }
     let row={
       title,price:Math.round(price),category:$('category').value,
