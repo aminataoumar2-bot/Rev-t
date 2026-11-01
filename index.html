@@ -207,7 +207,19 @@ textarea {
 <div class="panel hidden" id="auth"><h2>Compte vendeur</h2><label>E-mail<input id="email" type="email" placeholder="adresse e-mail"></label><label>Mot de passe<input id="pass" type="password" placeholder="6 caractères minimum"></label><p><button id="login">Connexion</button> <button class="alt" id="signup">Créer un compte</button> <button class="alt" id="forgot">Mot de passe oublié ?</button><button class="alt hidden" id="logout">Déconnexion</button></p><div id="authMsg" class="small"></div></div>
 <div class="panel hidden" id="publish"><h2>Déposer une annonce</h2><div class="gridform">
 <label>Titre<input id="title" placeholder="Ex. Robe fleurie"></label><label>Prix en GNF<input id="price" type="number" min="0" placeholder="150000"></label>
-<label>Catégorie<select id="category"><option>Vêtements femme</option><option>Vêtements homme</option><option>Enfants</option><option>Chaussures</option><option>Sacs et accessoires</option><option>Autres</option></select></label><label>Taille<input id="size" placeholder="M, 38…"></label>
+<label>Catégorie
+<select id="category">
+<option>Vêtements femme</option>
+<option>Vêtements homme</option>
+<option>Chaussures</option>
+<option>Sacs et accessoires</option>
+<option>Téléphones et électronique</option>
+<option>Maison et décoration</option>
+<option>Beauté et cosmétiques</option>
+<option>Enfants</option>
+<option>Autres</option>
+</select>
+</label><label>Taille<input id="size" placeholder="M, 38…"></label>
 <label>État<select id="condition"><option>Très bon état</option><option>Bon état</option><option>Neuf avec étiquette</option><option>État correct</option></select></label><label>Ville<input id="city" value="Conakry"></label>
 <label>Nom / pseudo vendeur<input id="seller" placeholder="Ton prénom ou pseudo"></label><label>WhatsApp (facultatif)<input id="phone" placeholder="+224…"></label>
 <label class="full">Description<textarea id="desc" rows="3" placeholder="Décris l’article…"></textarea></label><label class="full">Photo (JPG, PNG ou WEBP, max. 5 MB)<input id="photo" type="file" accept="image/jpeg,image/png,image/webp"></label></div><p><button id="submit">Publier l’annonce</button></p><div id="pubMsg" class="small"></div></div>
