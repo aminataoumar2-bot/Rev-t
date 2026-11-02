@@ -267,7 +267,10 @@ function render(){
       <p>${esc(x.description||'')}</p>
       <div class="small">Vendeur : ${esc(x.seller_name||'Membre ReVêt')}</div>
       ${x.seller_phone?`<p><a href="https://wa.me/${esc(x.seller_phone.replace(/\D/g,''))}?text=${encodeURIComponent('Bonjour, votre annonce m’intéresse : '+x.title)}" target="_blank">Contacter sur WhatsApp</a></p>`:''}
-      ${user && x.seller_id===user.id ? `<button class="delete-listing" data-id="${esc(x.id)}">Supprimer</button>` : ''}
+      ${user && x.seller_id===user.id ? `
+  <button class="edit-listing" data-id="${esc(x.id)}">Modifier</button>
+  <button class="delete-listing" data-id="${esc(x.id)}">Supprimer</button>
+` : ''}
     </div>
   </article>`).join('')||'<p class="small">Aucune annonce pour le moment.</p>';
 
