@@ -381,7 +381,30 @@ $('submit').onclick=async()=>{
 
 ['search','catfilter','sort'].forEach(id=>
   $(id).addEventListener(id==='search'?'input':'change',render)
-);
+);const category = $('category');
+const size = $('size');
+const sizeLabel = $('sizeLabel');
+
+function updateSizeField() {
+  const c = category.value;
+
+  if (c === 'Chaussures') {
+    sizeLabel.firstChild.textContent = 'Pointure ';
+    size.placeholder = 'Ex. 38, 39, 40…';
+  } else if (c === 'Vêtements femme' || c === 'Vêtements homme' || c === 'Enfants') {
+    sizeLabel.firstChild.textContent = 'Taille ';
+    size.placeholder = 'Ex. S, M, L, XL…';
+  } else if (c === 'Téléphones et électronique') {
+    sizeLabel.firstChild.textContent = 'Marque et modèle ';
+    size.placeholder = 'Ex. Samsung A15…';
+  } else {
+    sizeLabel.firstChild.textContent = 'Précision ';
+    size.placeholder = 'Ex. Type, modèle ou dimension…';
+  }
+}
+
+category.addEventListener('change', updateSizeField);
+updateSizeField();
 })();
 
   
