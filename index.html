@@ -242,7 +242,7 @@ textarea {
 
 (()=>{
 const $=id=>document.getElementById(id);
-let db=null,user=null,items=[];
+let db=null,user=null,items=[],editingId=null;
 
 const say=(id,t,ok=false)=>{
   $(id).textContent=t;
