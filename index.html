@@ -256,7 +256,33 @@ function render(){
   let a=items.filter(x=>(!cat||x.category===cat)&&[x.title,x.description,x.city,x.category].some(v=>String(v||'').toLowerCase().includes(q)));
   a.sort((x,y)=>sort==='low'?x.price-y.price:sort==='high'?y.price-x.price:new Date(y.created_at)-new Date(x.created_at));
   $('count').textContent=a.length+' annonce(s)';
-  $('cards').innerHTML=a.map(x=>`<article class="card"><div class="photo">${x.image_url?`<img src="${esc(x.image_url)}" alt="${esc(x.title)}">`:'Photo à venir'}</div><div class="body"><div class="price">${money(x.price)}</div><h3>${esc(x.title)}</h3><div class="small">${esc(x.category)} · ${esc(x.size||'Taille non précisée')}</div><div class="small">${esc(x.city||'Guinée')} · ${esc(x.condition||'')}</div><p>${esc(x.description||'')}</p><div class="small">Vendeur : ${esc(x.seller_name||'Membre ReVêt')}</div>${x.seller_phone?`<p><a href="https://wa.me/${esc(x.seller_phone.replace(/\D/g,''))}?text=${encodeURIComponent('Bonjour, votre annonce m’intéresse : '+x.title)}" target="_blank">Contacter sur WhatsApp</a></p>`:''}</div></article>`).join('')||'<p class="small">Aucune annonce pour le moment.</p>';
+
+  $('cards').innerHTML=a.map(x=>`<article class="card">
+    <div class="photo">${x.image_url?`<img src="${esc(x.image_url)}" alt="${esc(x.title)}">`:'Photo à venir'}</div>
+    <div class="body">
+      <div class="price">${money(x.price)}</div>
+      <h3>${esc(x.title)}</h3>
+      <div class="small">${esc(x.category)} · ${esc(x.size||'Taille non précisée')}</div>
+      <div class="small">${esc(x.city||'Guinée')} · ${esc(x.condition||'')}</div>
+      <p>${esc(x.description||'')}</p>
+      <div class="small">Vendeur : ${esc(x.seller_name||'Membre ReVêt')}</div>
+      ${x.seller_phone?`<p><a href="https://wa.me/${esc(x.seller_phone.replace(/\D/g,''))}?text=${encodeURIComponent('Bonjour, votre annonce m’intéresse : '+x.title)}" target="_blank">Contacter sur WhatsApp</a></p>`:''}
+      ${user && x.seller_id===user.id ? `<button class="delete-listing" data-id="${esc(x.id)}">Supprimer</button>` : ''}
+    </div>
+  </article>`).join('')||'<p class="small">Aucune annonce pour le moment.</p>';
+
+  document.querySelectorAll('.delete-listing').forEach(btn=>{
+    btn.addEventListener('click',async()=>{
+      if(!confirm('Veux-tu vraiment supprimer cette annonce ?'))return;
+      const r=await db.from('listings').delete().eq('id',btn.dataset.id).eq('seller_id',user.id);
+      if(r.error){
+        alert('Erreur de suppression : '+r.error.message);
+        return;
+      }
+      alert('Annonce supprimée !');
+      await load();
+    });
+  });
 }
 
 async function load(){
