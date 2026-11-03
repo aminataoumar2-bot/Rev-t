@@ -289,9 +289,7 @@ document.querySelectorAll('.edit-listing').forEach(btn=>{
     $('phone').value=x.seller_phone||'';
     $('city').value=x.city||'';
 
-    updateSizeField();
-    $('publishForm').style.display = 'block';
-$('publishToggle').textContent = 'Fermer le formulaire';
+    $('publish').classList.remove('hidden');
     say('pubMsg','Modifie les informations puis clique sur Publier pour enregistrer.',true);
   });
 });
