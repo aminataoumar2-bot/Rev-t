@@ -427,8 +427,21 @@ $('submit').onclick=async()=>{
   ? await db.from('listings').update(row).eq('id',editingId).eq('seller_id',user.id)
   : await db.from('listings').insert(row);
     if(r.error)return say('pubMsg','Erreur annonce : '+r.error.message);
-    say('pubMsg','Annonce publiée !',true);
-    await load();
+    say('pubMsg',editingId ? 'Annonce modifiée avec succès !' : 'Annonce publiée !',true);
+
+editingId = null;
+$('title').value = '';
+$('price').value = '';
+$('category').selectedIndex = 0;
+$('size').value = '';
+$('condition').selectedIndex = 0;
+$('desc').value = '';
+$('seller').value = '';
+$('phone').value = '';
+$('city').value = 'Conakry';
+$('photo').value = '';
+
+await load();
   }catch(e){say('pubMsg','Erreur : '+e.message);}
 };
 
