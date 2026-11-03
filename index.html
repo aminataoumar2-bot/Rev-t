@@ -280,7 +280,7 @@ document.querySelectorAll('.edit-listing').forEach(btn=>{
   alert('Annonce introuvable dans la liste.');
   return;
     }
-
+alert($('title') ? 'Champ titre trouvé !' : 'Champ titre introuvable !');
     editingId=x.id;
     $('title').value=x.title||'';
     $('price').value=x.price||'';
