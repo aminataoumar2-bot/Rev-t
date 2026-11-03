@@ -273,7 +273,27 @@ function render(){
 ` : ''}
     </div>
   </article>`).join('')||'<p class="small">Aucune annonce pour le moment.</p>';
+document.querySelectorAll('.edit-listing').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    const x=items.find(item=>String(item.id)===btn.dataset.id);
+    if(!x)return;
 
+    editingId=x.id;
+    $('title').value=x.title||'';
+    $('price').value=x.price||'';
+    $('category').value=x.category||'';
+    $('size').value=x.size||'';
+    $('condition').value=x.condition||'';
+    $('desc').value=x.description||'';
+    $('seller').value=x.seller_name||'';
+    $('phone').value=x.seller_phone||'';
+    $('city').value=x.city||'';
+
+    updateSizeField();
+    $('publishToggle').click();
+    say('pubMsg','Modifie les informations puis clique sur Publier pour enregistrer.',true);
+  });
+});
   document.querySelectorAll('.delete-listing').forEach(btn=>{
     btn.addEventListener('click',async()=>{
       if(!confirm('Veux-tu vraiment supprimer cette annonce ?'))return;
