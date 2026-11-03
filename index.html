@@ -401,7 +401,9 @@ $('submit').onclick=async()=>{
       seller_name:$('seller').value||null,seller_phone:$('phone').value||null,
       city:$('city').value||'Conakry'
     };
-    let r=await db.from('listings').insert(row);
+    let r=editingId
+  ? await db.from('listings').update(row).eq('id',editingId).eq('seller_id',user.id)
+  : await db.from('listings').insert(row);
     if(r.error)return say('pubMsg','Erreur annonce : '+r.error.message);
     say('pubMsg','Annonce publiée !',true);
     await load();
