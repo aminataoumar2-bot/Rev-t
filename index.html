@@ -275,7 +275,7 @@ function render(){
   </article>`).join('')||'<p class="small">Aucune annonce pour le moment.</p>';
 document.querySelectorAll('.edit-listing').forEach(btn=>{
   btn.addEventListener('click',()=>{
-    const x=items.find(item=>String(item.id)===btn.dataset.id);
+   alert('Le bouton Modifier fonctionne !'); const x=items.find(item=>String(item.id)===btn.dataset.id);
     if(!x)return;
 
     editingId=x.id;
