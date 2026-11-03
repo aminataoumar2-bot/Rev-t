@@ -276,7 +276,10 @@ function render(){
 document.querySelectorAll('.edit-listing').forEach(btn=>{
   btn.addEventListener('click',()=>{
    alert('Le bouton Modifier fonctionne !'); const x=items.find(item=>String(item.id)===btn.dataset.id);
-    if(!x)return;
+    if(!x){
+  alert('Annonce introuvable dans la liste.');
+  return;
+    }
 
     editingId=x.id;
     $('title').value=x.title||'';
