@@ -291,7 +291,7 @@ document.querySelectorAll('.edit-listing').forEach(btn=>{
     $('seller').value=x.seller_name||'';
     $('phone').value=x.seller_phone||'';
     $('city').value=x.city||'';
-
+alert('Les informations sont chargées !');
     $('publish').classList.remove('hidden');
     say('pubMsg','Modifie les informations puis clique sur Publier pour enregistrer.',true);
   });
