@@ -430,6 +430,7 @@ $('submit').onclick=async()=>{
     say('pubMsg',editingId ? 'Annonce modifiée avec succès !' : 'Annonce publiée !',true);
 
 editingId = null;
+alert('Mode modification réinitialisé');
 $('title').value = '';
 $('price').value = '';
 $('category').selectedIndex = 0;
