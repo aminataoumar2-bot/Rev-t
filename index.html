@@ -383,7 +383,7 @@ $('submit').onclick=async()=>{
     if(!user)return say('pubMsg','Connecte-toi ou crée un compte avant de publier.');
     let title=$('title').value.trim(),price=Number($('price').value),f=$('photo').files[0];
     if(!title||!Number.isFinite(price)||price<0)return say('pubMsg','Remplis le titre et le prix.');
-    let image_url=null;
+    let image_url=editingId ? (items.find(x=>x.id===editingId)?.image_url || null) : null;
     if(f){
       if(f.size>5*1024*1024)return say('pubMsg','La photo doit faire moins de 5 MB.');
       if(!['image/jpeg','image/png','image/webp'].includes(f.type))return say('pubMsg','Choisis JPG, PNG ou WEBP.');
