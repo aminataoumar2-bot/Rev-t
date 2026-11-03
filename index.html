@@ -290,7 +290,8 @@ document.querySelectorAll('.edit-listing').forEach(btn=>{
     $('city').value=x.city||'';
 
     updateSizeField();
-    $('publishToggle').click();
+    $('publishForm').style.display = 'block';
+$('publishToggle').textContent = 'Fermer le formulaire';
     say('pubMsg','Modifie les informations puis clique sur Publier pour enregistrer.',true);
   });
 });
